@@ -15,6 +15,7 @@ import os
 # создаю flask instance
 app = Flask(__name__)
 
+
 # ckeditor
 ckeditor = CKEditor(app)
 
@@ -22,8 +23,7 @@ ckeditor = CKEditor(app)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 
 # БД на postgress
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://pksnyfujebenpn:d9dad89845a721460c3504320429cd75d348090cf739adb35046014f4fff3459@ec2-18-209-78-11.compute-1.amazonaws.com:5432/d816afa4dldt15'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://jyadstgqhcqzxf:43315e91136a32654eede930f699276d18f870de06ace9499d9646988638fe67@ec2-44-210-36-247.compute-1.amazonaws.com:5432/d5ao67j46k8qh7'
 # секретный ключ!
 app.config['SECRET_KEY'] = 'КАКОЙ ТО СЕКРЕТНЫЙ КЛЮЧ'
 
