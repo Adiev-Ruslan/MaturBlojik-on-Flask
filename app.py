@@ -14,7 +14,7 @@ import os
 
 # создаю flask instance
 app = Flask(__name__)
-
+app.config.from_pyfile('settings.py')
 
 # ckeditor
 ckeditor = CKEditor(app)
@@ -244,26 +244,31 @@ def get_current_date():
 
 # удаление пользователя
 @app.route('/delete/<int:id>')
+@login_required
 def delete(id):
-    user_to_delete = Users.query.get_or_404(id)
-    name = None
-    form = UserForm()
+    if id == current_user.id:
+        user_to_delete = Users.query.get_or_404(id)
+        name = None
+        form = UserForm()
 
-    try:
-        db.session.delete(user_to_delete)
-        db.session.commit()
-        flash('Пользователь Удален!')
-        our_users = Users.query.order_by(Users.date_added)
-        return render_template('add_user.html', 
-                                form=form,
-                                name=name,
-                                our_users=our_users)
-    except:
-            flash('Упсс! Ты где то недоглядел.')
+        try:
+            db.session.delete(user_to_delete)
+            db.session.commit()
+            flash('Пользователь Удален!')
+            our_users = Users.query.order_by(Users.date_added)
             return render_template('add_user.html', 
-                                form=form,
-                                name=name,
-                                our_users=our_users)
+                                    form=form,
+                                    name=name,
+                                    our_users=our_users)
+        except:
+                flash('Упсс! Ты где то недоглядел.')
+                return render_template('add_user.html', 
+                                    form=form,
+                                    name=name,
+                                    our_users=our_users)
+    else:
+        flash('Вы не можете удалить этого пользователя')
+        return redirect(url_for('dashboard'))
 
 # обновление записей в БД
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
