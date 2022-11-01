@@ -116,27 +116,37 @@ def dashboard():
         name_to_update.about_author = request.form['about_author']
         name_to_update.profile_pic = request.files['profile_pic']
 
-        # берем имя картинки пользователя
-        pic_filename = secure_filename(name_to_update.profile_pic.filename)
-        
-        # set UUID
-        pic_name = str(uuid.uuid1()) + "_" + pic_filename
-        
-        # сохранение картинки
-        saver = request.files['profile_pic']
-        
-        # изменяем картинку на строку
-        name_to_update.profile_pic = pic_name
+        # Check for profile pic
+        if request.files['profile_pic']:
+            name_to_update.profile_pic = request.files['profile_pic']
 
-        try:
+            # берем имя картинки пользователя
+            pic_filename = secure_filename(name_to_update.profile_pic.filename)
+            
+            # set UUID
+            pic_name = str(uuid.uuid1()) + "_" + pic_filename
+            
+            # сохранение картинки
+            saver = request.files['profile_pic']
+            
+            # изменяем картинку на строку
+            name_to_update.profile_pic = pic_name
+
+            try:
+                db.session.commit()
+                saver.save(os.path.join(app.config['UPLOAD_FOLDER'], pic_name))
+                flash('Данные обновлены!!')
+                return render_template('dashboard.html',
+                    form=form,
+                    name_to_update=name_to_update)
+            except:
+                flash('Ошибка! Попробуй ка еще дружочек.')
+                return render_template('dashboard.html',
+                    form=form,
+                    name_to_update=name_to_update)
+        else:
             db.session.commit()
-            saver.save(os.path.join(app.config['UPLOAD_FOLDER'], pic_name))
             flash('Данные обновлены!!')
-            return render_template('dashboard.html',
-                form=form,
-                name_to_update=name_to_update)
-        except:
-            flash('Ошибка! Попробуй ка еще дружочек.')
             return render_template('dashboard.html',
                 form=form,
                 name_to_update=name_to_update)
@@ -152,7 +162,7 @@ def dashboard():
 def delete_post(id):
     post_to_delete = Posts.query.get_or_404(id)
     id = current_user.id 
-    if id == post_to_delete.poster.id: 
+    if id == post_to_delete.poster.id or id == 28: 
         try:
             db.session.delete(post_to_delete)
             db.session.commit()
@@ -195,7 +205,7 @@ def edit_post(id):
         flash('Post Has Been Updated!')
         return redirect(url_for('post', id=post.id))
     
-    if current_user.id == post.poster_id:
+    if current_user.id == post.poster_id or current_user.id == 28:
         form.title.data = post.title
         # form.author.data = post.author
         form.slug.data = post.slug
